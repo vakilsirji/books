@@ -1,4 +1,7 @@
 {
+  "scripts": {
+    "postinstall": "npx prisma generate --schema backend/prisma/schema.prisma"
+  },
   "dependencies": {
     "@prisma/adapter-pg": "^7.5.0",
     "@prisma/client": "^7.5.0",
