@@ -7,6 +7,17 @@ const approvalColors = { PENDING: '#f59e0b', APPROVED: '#10b981', REJECTED: '#ef
 const subColors = { TRIALING: '#0f766e', ACTIVE: '#10b981', PAST_DUE: '#f59e0b', CANCELED: '#64748b' };
 const fmt = (v) => v ? new Date(v).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Not set';
 
+function formBody(values) {
+    return new URLSearchParams(
+        Object.entries(values).reduce((acc, [key, value]) => {
+            if (value !== undefined && value !== null) {
+                acc[key] = value;
+            }
+            return acc;
+        }, {})
+    );
+}
+
 function SocietyAdminView({ token, user }) {
     const [stats, setStats] = useState(null);
     const [members, setMembers] = useState([]);
@@ -36,9 +47,9 @@ function SocietyAdminView({ token, user }) {
     const act = async (url, body) => {
         const res = await fetch(url, {
             method: 'PATCH',
-            headers: { ...headers, 'Content-Type': 'application/json' },
+            headers: { ...headers, 'Content-Type': 'application/x-www-form-urlencoded' },
             credentials: 'include',
-            body: JSON.stringify(body)
+            body: formBody(body)
         });
         if (res.ok) load();
     };
@@ -128,9 +139,9 @@ function PlatformAdminView({ token }) {
         try {
             const res = await fetch(url, {
                 method: 'PATCH',
-                headers: { ...headers, 'Content-Type': 'application/json' },
+                headers: { ...headers, 'Content-Type': 'application/x-www-form-urlencoded' },
                 credentials: 'include',
-                body: JSON.stringify(body)
+                body: formBody(body)
             });
             if (!res.ok) {
                 const data = await res.json().catch(() => ({ error: 'Failed to update society' }));
@@ -148,9 +159,9 @@ function PlatformAdminView({ token }) {
         e.preventDefault();
         const res = await fetch('/api/societies/admin/platform/societies', {
             method: 'POST',
-            headers: { ...headers, 'Content-Type': 'application/json' },
+            headers: { ...headers, 'Content-Type': 'application/x-www-form-urlencoded' },
             credentials: 'include',
-            body: JSON.stringify(createForm)
+            body: formBody(createForm)
         });
 
         if (res.ok) {

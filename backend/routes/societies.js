@@ -289,7 +289,7 @@ router.get('/admin/requests', authMiddleware, adminOnly, async (req, res) => {
 // PATCH promote/demote member role
 router.patch('/admin/members/:id/role', authMiddleware, adminOnly, async (req, res) => {
     const { id } = req.params;
-    const { role } = req.body;
+    const role = getFieldFromRequest(req, 'role');
     const validRoles = ['MEMBER', 'SOCIETY_ADMIN'];
     if (!validRoles.includes(role)) return res.status(400).json({ error: 'Invalid role' });
     try {
@@ -307,7 +307,7 @@ router.patch('/admin/members/:id/role', authMiddleware, adminOnly, async (req, r
 // PATCH approve or reject a pending member
 router.patch('/admin/members/:id/approve', authMiddleware, adminOnly, async (req, res) => {
     const { id } = req.params;
-    const { action } = req.body; // 'approve' or 'reject'
+    const action = getFieldFromRequest(req, 'action'); // 'approve' or 'reject'
     try {
         if (action === 'approve') {
             const user = await prisma.user.update({
@@ -394,17 +394,15 @@ router.get('/admin/platform/overview', authMiddleware, platformOnly, async (req,
 });
 
 router.post('/admin/platform/societies', authMiddleware, platformOnly, async (req, res) => {
-    const {
-        name,
-        city,
-        accessCode,
-        approvalStatus,
-        subscriptionPlan,
-        subscriptionStatus,
-        adminName,
-        adminPhone,
-        adminPassword
-    } = req.body;
+    const name = getFieldFromRequest(req, 'name');
+    const city = getFieldFromRequest(req, 'city');
+    const accessCode = getFieldFromRequest(req, 'accessCode');
+    const approvalStatus = getFieldFromRequest(req, 'approvalStatus');
+    const subscriptionPlan = getFieldFromRequest(req, 'subscriptionPlan');
+    const subscriptionStatus = getFieldFromRequest(req, 'subscriptionStatus');
+    const adminName = getFieldFromRequest(req, 'adminName');
+    const adminPhone = getFieldFromRequest(req, 'adminPhone');
+    const adminPassword = getFieldFromRequest(req, 'adminPassword');
     let code = accessCode?.trim().toUpperCase();
     const normalizedAdminName = adminName?.trim();
     const normalizedAdminPhone = adminPhone?.trim();
@@ -501,7 +499,7 @@ router.post('/admin/platform/societies', authMiddleware, platformOnly, async (re
 
 router.patch('/admin/platform/societies/:id/approval', authMiddleware, platformOnly, async (req, res) => {
     const { id } = req.params;
-    const { approvalStatus } = req.body;
+    const approvalStatus = getFieldFromRequest(req, 'approvalStatus');
     const validStatuses = ['PENDING', 'APPROVED', 'REJECTED'];
 
     if (!validStatuses.includes(approvalStatus)) {
@@ -531,7 +529,9 @@ router.patch('/admin/platform/societies/:id/approval', authMiddleware, platformO
 
 router.patch('/admin/platform/societies/:id/subscription', authMiddleware, platformOnly, async (req, res) => {
     const { id } = req.params;
-    const { subscriptionPlan, subscriptionStatus, subscriptionEndsAt } = req.body;
+    const subscriptionPlan = getFieldFromRequest(req, 'subscriptionPlan');
+    const subscriptionStatus = getFieldFromRequest(req, 'subscriptionStatus');
+    const subscriptionEndsAt = getFieldFromRequest(req, 'subscriptionEndsAt');
     const validPlans = ['FREE', 'PRO', 'ENTERPRISE'];
     const validStatuses = ['TRIALING', 'ACTIVE', 'PAST_DUE', 'CANCELED'];
 
