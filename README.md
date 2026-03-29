@@ -17,8 +17,8 @@ Residents can join a society, list books, request books from neighbors, connect 
 
 ### Platform Admin
 
-- Phone: `9999999999`
-- Password: `Admin@123`
+- Phone:
+- Password:
 
 ### Test Notes
 
