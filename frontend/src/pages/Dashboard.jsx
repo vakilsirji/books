@@ -11,6 +11,10 @@ export default function Dashboard() {
     const { user, token } = useAuth();
     const navigate = useNavigate();
 
+    const hasActiveRequest = (book) => (
+        requestedBookIds.includes(book.id) || (book.requests?.length ?? 0) > 0
+    );
+
     useEffect(() => {
         const fetchBooks = async () => {
             try {
@@ -189,9 +193,9 @@ export default function Dashboard() {
                                     <button
                                         className="btn btn-primary"
                                         onClick={() => handleRequest(book.id)}
-                                        disabled={requestedBookIds.includes(book.id)}
+                                        disabled={hasActiveRequest(book)}
                                     >
-                                        {requestedBookIds.includes(book.id) ? 'Request Sent' : 'Request Book'}
+                                        {hasActiveRequest(book) ? 'Request Sent' : 'Request Book'}
                                     </button>
                                     <div className="book-dashboard-contact-row">
                                         {getWhatsAppLink(book) && (

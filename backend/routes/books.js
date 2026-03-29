@@ -113,7 +113,14 @@ router.get('/', async (req, res) => {
         const books = await prisma.book.findMany({
             where,
             include: {
-                owner: { select: { id: true, name: true, phone: true, wing: true, roomNumber: true } }
+                owner: { select: { id: true, name: true, phone: true, wing: true, roomNumber: true } },
+                requests: {
+                    where: {
+                        requesterId: req.user.id,
+                        status: { in: ['REQUESTED', 'APPROVED', 'PICKED'] }
+                    },
+                    select: { id: true, status: true }
+                }
             },
             orderBy: { createdAt: 'desc' }
         });

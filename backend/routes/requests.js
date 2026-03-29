@@ -75,6 +75,18 @@ router.post('/', async (req, res) => {
             return res.status(400).json({ error: 'Cannot request your own book' });
         }
 
+        const existingRequest = await prisma.exchangeRequest.findFirst({
+            where: {
+                bookId,
+                requesterId: req.user.id,
+                status: { in: ['REQUESTED', 'APPROVED', 'PICKED'] }
+            }
+        });
+
+        if (existingRequest) {
+            return res.status(400).json({ error: 'You already requested this book' });
+        }
+
         const request = await prisma.exchangeRequest.create({
             data: {
                 bookId,
@@ -121,7 +133,10 @@ router.get('/', async (req, res) => {
 // Update request status (Approve, Reject, Picked, Returned)
 router.patch('/:id', async (req, res) => {
     const { id } = req.params;
-    const { status } = req.body;
+    const status = getFieldFromRequest(req, 'status');
+    if (!status) {
+        return res.status(400).json({ error: 'Status is required' });
+    }
 
     try {
         const request = await prisma.exchangeRequest.findUnique({
