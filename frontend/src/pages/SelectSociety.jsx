@@ -2,6 +2,17 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/useAuth';
 
+function formBody(values) {
+    return new URLSearchParams(
+        Object.entries(values).reduce((acc, [key, value]) => {
+            if (value !== undefined && value !== null) {
+                acc[key] = value;
+            }
+            return acc;
+        }, {})
+    );
+}
+
 export default function SelectSociety() {
     const [societies, setSocieties] = useState([]);
     const [isCreating, setIsCreating] = useState(false);
@@ -44,16 +55,16 @@ export default function SelectSociety() {
             return;
         }
         try {
-            console.log('--- Creating Society ---');
-            console.log('Token from AuthContext:', token);
-            const headers = { 'Content-Type': 'application/json' };
+            const headers = { 'Content-Type': 'application/x-www-form-urlencoded' };
             if (token && token !== 'null') headers['Authorization'] = `Bearer ${token}`;
 
-            const res = await fetch('/api/societies', {
+            const res = await fetch(
+                `/api/societies?name=${encodeURIComponent(formData.name)}&city=${encodeURIComponent(formData.city)}&accessCode=${encodeURIComponent(formData.accessCode)}&wing=${encodeURIComponent(formData.wing)}&roomNumber=${encodeURIComponent(formData.roomNumber)}`,
+                {
                 method: 'POST',
                 headers,
                 credentials: 'include',
-                body: JSON.stringify(formData)
+                body: formBody(formData)
             });
             const data = await res.json().catch(() => ({ error: 'Server connection failed. Is the backend running?' }));
             if (!res.ok) throw new Error(data.error || 'Failed to create society');
@@ -68,14 +79,14 @@ export default function SelectSociety() {
     const handleJoin = async (e) => {
         e.preventDefault();
         try {
-            const res = await fetch('/api/societies/join', {
+            const res = await fetch(`/api/societies/join?accessCode=${encodeURIComponent(joinCode)}&wing=${encodeURIComponent(homeDetails.wing)}&roomNumber=${encodeURIComponent(homeDetails.roomNumber)}`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'application/x-www-form-urlencoded',
                     'Authorization': `Bearer ${token}`
                 },
                 credentials: 'include',
-                body: JSON.stringify({ accessCode: joinCode, ...homeDetails })
+                body: formBody({ accessCode: joinCode, ...homeDetails })
             });
             const data = await res.json().catch(() => ({ error: 'Server connection failed. Is the backend running?' }));
             if (!res.ok) throw new Error(data.error || 'Invalid access code');
@@ -89,14 +100,14 @@ export default function SelectSociety() {
 
     const handleDirectJoin = async (societyId) => {
         try {
-            const res = await fetch('/api/societies/join', {
+            const res = await fetch(`/api/societies/join?societyId=${encodeURIComponent(societyId)}&wing=${encodeURIComponent(homeDetails.wing)}&roomNumber=${encodeURIComponent(homeDetails.roomNumber)}`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'application/x-www-form-urlencoded',
                     'Authorization': `Bearer ${token}`
                 },
                 credentials: 'include',
-                body: JSON.stringify({ societyId, ...homeDetails })
+                body: formBody({ societyId, ...homeDetails })
             });
             const data = await res.json().catch(() => ({ error: 'Server connection failed. Is the backend running?' }));
             if (!res.ok) throw new Error(data.error || 'Failed to join society');

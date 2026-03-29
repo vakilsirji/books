@@ -6,6 +6,61 @@ const jwt = require('jsonwebtoken');
 const { tokenCookieOptions } = require('../cookieOptions');
 const bcrypt = require('bcryptjs');
 
+function parseFormEncoded(value) {
+    const params = new URLSearchParams(value);
+    const result = {};
+
+    for (const [key, formValue] of params.entries()) {
+        result[key] = formValue;
+    }
+
+    return result;
+}
+
+function getRequestBody(req) {
+    if (
+        req.body &&
+        typeof req.body === 'object' &&
+        !Array.isArray(req.body) &&
+        Object.keys(req.body).length > 0
+    ) {
+        return req.body;
+    }
+
+    if (typeof req.body === 'string' && req.body.trim()) {
+        try {
+            return JSON.parse(req.body);
+        } catch (_error) {
+            return parseFormEncoded(req.body);
+        }
+    }
+
+    if (typeof req.rawBody === 'string' && req.rawBody.trim()) {
+        try {
+            return JSON.parse(req.rawBody);
+        } catch (_error) {
+            return parseFormEncoded(req.rawBody);
+        }
+    }
+
+    return {};
+}
+
+function getFieldFromRequest(req, fieldName) {
+    const body = getRequestBody(req);
+    const fromBody = body[fieldName];
+    if (fromBody !== undefined && fromBody !== null && fromBody !== '') {
+        return String(fromBody);
+    }
+
+    const query = req.query || req.netlifyEvent?.queryStringParameters || {};
+    if (query[fieldName] !== undefined && query[fieldName] !== null && query[fieldName] !== '') {
+        return String(query[fieldName]);
+    }
+
+    return '';
+}
+
 // Helper to generate unique 6-character alphanumeric code
 const generateAccessCode = () => {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -39,9 +94,11 @@ router.get('/', async (req, res) => {
 
 // Create a new society
 router.post('/', authMiddleware, async (req, res) => {
-    console.log('Society creation request received:', req.body);
-    const { name, city, wing, roomNumber } = req.body;
-    let { accessCode } = req.body;
+    const name = getFieldFromRequest(req, 'name');
+    const city = getFieldFromRequest(req, 'city');
+    const wing = getFieldFromRequest(req, 'wing');
+    const roomNumber = getFieldFromRequest(req, 'roomNumber');
+    let accessCode = getFieldFromRequest(req, 'accessCode');
 
     if (!name || !city) {
         return res.status(400).json({ error: 'Name and City are required' });
@@ -112,7 +169,10 @@ router.post('/', authMiddleware, async (req, res) => {
 
 // Join a society
 router.post('/join', authMiddleware, async (req, res) => {
-    const { accessCode, societyId, wing, roomNumber } = req.body;
+    const accessCode = getFieldFromRequest(req, 'accessCode');
+    const societyId = getFieldFromRequest(req, 'societyId');
+    const wing = getFieldFromRequest(req, 'wing');
+    const roomNumber = getFieldFromRequest(req, 'roomNumber');
     const normalizedCode = accessCode?.trim().toUpperCase();
     const normalizedSocietyId = societyId?.trim();
     if (!normalizedCode && !normalizedSocietyId) {
