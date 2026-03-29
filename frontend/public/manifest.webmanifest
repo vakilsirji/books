@@ -1,0 +1,24 @@
+{
+  "name": "BookCircle",
+  "short_name": "BookCircle",
+  "description": "Hyperlocal community book exchange for societies and apartments.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#eef2ea",
+  "theme_color": "#0f3d3e",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}

@@ -11,6 +11,7 @@ import Profile from './pages/Profile';
 import AdminDashboard from './pages/AdminDashboard';
 import PendingApproval from './pages/PendingApproval';
 import Navigation from './components/Navigation';
+import PWAInstallPrompt from './components/PWAInstallPrompt';
 
 const ProtectedRoute = ({ children }) => {
   const { user } = useAuth();
@@ -74,7 +75,10 @@ function App() {
   return (
     <AuthProvider>
       <div className="app-container">
+        <div className="app-shell-glow app-shell-glow-one" />
+        <div className="app-shell-glow app-shell-glow-two" />
         <Router>
+          <PWAInstallPrompt />
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/society" element={<SocietyRoute><SelectSociety /></SocietyRoute>} />

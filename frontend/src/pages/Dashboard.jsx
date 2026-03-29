@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useAuth } from '../context/useAuth';
-import { ArrowRight, BookOpen, MessageCircle, Search, Sparkles, Users } from 'lucide-react';
+import { ArrowRight, BookOpen, MessageCircle, PhoneCall, Search, Sparkles, Users } from 'lucide-react';
 
 export default function Dashboard() {
     const [books, setBooks] = useState([]);
@@ -71,6 +71,12 @@ export default function Dashboard() {
         ].filter(Boolean).join(' ');
 
         return `https://wa.me/91${phone}?text=${encodeURIComponent(message)}`;
+    };
+
+    const getCallLink = (book) => {
+        const phone = (book.owner?.phone || '').replace(/\D/g, '');
+        if (!phone) return null;
+        return `tel:+91${phone}`;
     };
 
     const ownBooks = useMemo(
@@ -172,25 +178,35 @@ export default function Dashboard() {
                             </div>
 
                             {book.ownerId !== user?.id ? (
-                                <div style={{ display: 'grid', gap: '0.75rem' }}>
+                                <div className="book-dashboard-actions">
                                     <button
                                         className="btn btn-primary"
                                         onClick={() => handleRequest(book.id)}
                                     >
                                         Request Book
                                     </button>
-                                    {getWhatsAppLink(book) && (
-                                        <a
-                                            className="btn btn-secondary"
-                                            href={getWhatsAppLink(book)}
-                                            target="_blank"
-                                            rel="noreferrer"
-                                            style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem' }}
-                                        >
-                                            <MessageCircle size={16} />
-                                            WhatsApp Owner
-                                        </a>
-                                    )}
+                                    <div className="book-dashboard-contact-row">
+                                        {getWhatsAppLink(book) && (
+                                            <a
+                                                className="btn btn-secondary contact-btn"
+                                                href={getWhatsAppLink(book)}
+                                                target="_blank"
+                                                rel="noreferrer"
+                                            >
+                                                <MessageCircle size={16} />
+                                                WhatsApp
+                                            </a>
+                                        )}
+                                        {getCallLink(book) && (
+                                            <a
+                                                className="btn btn-secondary contact-btn"
+                                                href={getCallLink(book)}
+                                            >
+                                                <PhoneCall size={16} />
+                                                Call Owner
+                                            </a>
+                                        )}
+                                    </div>
                                 </div>
                             ) : (
                                 <div className="book-dashboard-self">This is your listing</div>
