@@ -50,7 +50,7 @@ export default function Login() {
         e.preventDefault();
         if (!phone) return setError('Phone is required');
         try {
-            const res = await fetch(`${API_BASE}/auth/check-user`, {
+            const res = await fetch(`${API_BASE}/auth/check-user?phone=${encodeURIComponent(phone)}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: formBody({ phone })
@@ -64,7 +64,7 @@ export default function Login() {
             if (data.exists && data.hasPassword) {
                 setStep(2);
             } else {
-                const otpRes = await fetch(`${API_BASE}/auth/request-otp`, {
+                const otpRes = await fetch(`${API_BASE}/auth/request-otp?phone=${encodeURIComponent(phone)}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                     body: formBody({ phone, name: data.name || name })
@@ -88,7 +88,7 @@ export default function Login() {
             if (!password) return setError('Password is required');
         }
         try {
-            const res = await fetch(`${API_BASE}/auth/verify-otp`, {
+            const res = await fetch(`${API_BASE}/auth/verify-otp?phone=${encodeURIComponent(phone)}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 credentials: 'include',

@@ -19,6 +19,17 @@ function getPhoneFromBody(body = {}) {
     return String(candidate).trim();
 }
 
+function getPhoneFromRequest(req) {
+    const body = getRequestBody(req);
+    const fromBody = getPhoneFromBody(body);
+    if (fromBody) {
+        return fromBody;
+    }
+
+    const query = req.query || req.netlifyEvent?.queryStringParameters || {};
+    return getPhoneFromBody(query);
+}
+
 function getRequestBody(req) {
     if (req.body && typeof req.body === 'object' && !Array.isArray(req.body)) {
         return req.body;
@@ -45,8 +56,7 @@ function getRequestBody(req) {
 
 // Check if user exists and has a password
 router.post('/check-user', async (req, res) => {
-    const body = getRequestBody(req);
-    const phone = getPhoneFromBody(body);
+    const phone = getPhoneFromRequest(req);
     if (!phone) {
         return res.status(400).json({ error: 'Phone is required' });
     }
@@ -79,7 +89,7 @@ router.post('/check-user', async (req, res) => {
 // Login with Password
 router.post('/login', async (req, res) => {
     const body = getRequestBody(req);
-    const phone = getPhoneFromBody(body);
+    const phone = getPhoneFromRequest(req);
     const { password } = body;
     if (!phone) {
         return res.status(400).json({ error: 'Phone is required' });
@@ -117,7 +127,7 @@ router.post('/login', async (req, res) => {
 // Request OTP (Mock)
 router.post('/request-otp', async (req, res) => {
     const body = getRequestBody(req);
-    const phone = getPhoneFromBody(body);
+    const phone = getPhoneFromRequest(req);
     const { name } = body;
     if (!phone) return res.status(400).json({ error: 'Phone is required' });
 
@@ -141,7 +151,7 @@ router.post('/request-otp', async (req, res) => {
 // Verify OTP & Complete Signup/Update
 router.post('/verify-otp', async (req, res) => {
     const body = getRequestBody(req);
-    const phone = getPhoneFromBody(body);
+    const phone = getPhoneFromRequest(req);
     const { otp, name, password } = body;
     if (!phone) {
         return res.status(400).json({ error: 'Phone is required' });
