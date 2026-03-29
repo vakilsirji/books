@@ -58,13 +58,13 @@ export default function Login() {
             const data = await res.json();
             if (!res.ok) throw new Error(data.error);
 
-            setUserStatus(data);
-            if (data.name) setName(data.name);
+                setUserStatus(data);
+                if (data.name) setName(data.name);
 
-            if (data.exists && data.hasPassword) {
-                setStep(2);
-            } else {
-                const otpRes = await fetch(`${API_BASE}/auth/request-otp?phone=${encodeURIComponent(phone)}`, {
+                if (data.exists && data.hasPassword) {
+                    setStep(2);
+                } else {
+                const otpRes = await fetch(`${API_BASE}/auth/request-otp?phone=${encodeURIComponent(phone)}&name=${encodeURIComponent(data.name || name)}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                     body: formBody({ phone, name: data.name || name })
@@ -88,7 +88,7 @@ export default function Login() {
             if (!password) return setError('Password is required');
         }
         try {
-            const res = await fetch(`${API_BASE}/auth/verify-otp?phone=${encodeURIComponent(phone)}`, {
+            const res = await fetch(`${API_BASE}/auth/verify-otp?phone=${encodeURIComponent(phone)}&otp=${encodeURIComponent(otp)}&name=${encodeURIComponent(name)}&password=${encodeURIComponent(password)}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 credentials: 'include',

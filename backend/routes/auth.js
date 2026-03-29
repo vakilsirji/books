@@ -42,15 +42,19 @@ function getPhoneFromRequest(req) {
 }
 
 function getPasswordFromRequest(req) {
+    return getFieldFromRequest(req, 'password');
+}
+
+function getFieldFromRequest(req, fieldName) {
     const body = getRequestBody(req);
-    const fromBody = body.password;
+    const fromBody = body[fieldName];
     if (fromBody) {
         return String(fromBody);
     }
 
     const query = req.query || req.netlifyEvent?.queryStringParameters || {};
-    if (query.password) {
-        return String(query.password);
+    if (query[fieldName]) {
+        return String(query[fieldName]);
     }
 
     return '';
@@ -166,9 +170,8 @@ router.post('/login', async (req, res) => {
 
 // Request OTP (Mock)
 router.post('/request-otp', async (req, res) => {
-    const body = getRequestBody(req);
     const phone = getPhoneFromRequest(req);
-    const { name } = body;
+    const name = getFieldFromRequest(req, 'name');
     if (!phone) return res.status(400).json({ error: 'Phone is required' });
 
     try {
@@ -190,9 +193,10 @@ router.post('/request-otp', async (req, res) => {
 
 // Verify OTP & Complete Signup/Update
 router.post('/verify-otp', async (req, res) => {
-    const body = getRequestBody(req);
     const phone = getPhoneFromRequest(req);
-    const { otp, name, password } = body;
+    const otp = getFieldFromRequest(req, 'otp');
+    const name = getFieldFromRequest(req, 'name');
+    const password = getPasswordFromRequest(req);
     if (!phone) {
         return res.status(400).json({ error: 'Phone is required' });
     }
