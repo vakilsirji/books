@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/useAuth';
 
-const API_BASE = import.meta.env.PROD ? '/.netlify/functions/api' : '/api';
+const API_BASE = import.meta.env.PROD ? '/.netlify/functions/api/api' : '/api';
 
 export default function Login() {
     const [phone, setPhone] = useState('');
