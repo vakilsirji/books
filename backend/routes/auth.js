@@ -110,6 +110,15 @@ router.post('/login', async (req, res) => {
     if (!phone) {
         return res.status(400).json({ error: 'Phone is required' });
     }
+    if (!password) {
+        console.error('Login missing password payload', {
+            hasBodyKeys: Object.keys(body || {}).length > 0,
+            bodyKeys: Object.keys(body || {}),
+            hasRawBody: typeof req.rawBody === 'string' && req.rawBody.length > 0,
+            queryKeys: Object.keys(req.query || {})
+        });
+        return res.status(400).json({ error: 'Password is required' });
+    }
 
     try {
         const user = await prisma.user.findUnique({
