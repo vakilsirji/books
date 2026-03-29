@@ -18,8 +18,18 @@ const societySelect = {
 router.post('/check-user', async (req, res) => {
     const { phone } = req.body;
     try {
-        const user = await prisma.user.findUnique({ where: { phone } });
-        res.json({
+        const user = await prisma.user.findUnique({
+            where: { phone },
+            select: {
+                id: true,
+                name: true,
+                password: true,
+                wing: true,
+                roomNumber: true
+            }
+        });
+
+        return res.json({
             exists: !!user,
             hasPassword: !!user?.password,
             name: user?.name || '',
@@ -28,7 +38,7 @@ router.post('/check-user', async (req, res) => {
         });
     } catch (error) {
         console.error('Check user error:', error);
-        res.status(500).json({ error: 'Server error' });
+        return res.status(500).json({ error: 'Server error' });
     }
 });
 
