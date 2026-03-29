@@ -1,0 +1,115 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Society {
+  id                  String                @id @default(uuid())
+  name                String
+  city                String
+  accessCode          String                @unique
+  approvalStatus      SocietyApprovalStatus @default(PENDING)
+  subscriptionPlan    SubscriptionPlan      @default(FREE)
+  subscriptionStatus  SubscriptionStatus    @default(TRIALING)
+  subscriptionEndsAt  DateTime?
+  approvedAt          DateTime?
+  createdAt           DateTime              @default(now())
+  users               User[]
+  books               Book[]
+}
+
+enum SocietyApprovalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum SubscriptionPlan {
+  FREE
+  PRO
+  ENTERPRISE
+}
+
+enum SubscriptionStatus {
+  TRIALING
+  ACTIVE
+  PAST_DUE
+  CANCELED
+}
+
+enum Role {
+  ADMIN
+  SOCIETY_ADMIN
+  MEMBER
+}
+
+enum UserStatus {
+  PENDING
+  ACTIVE
+}
+
+model User {
+  id         String     @id @default(uuid())
+  name       String
+  phone      String     @unique
+  password   String?
+  wing       String?
+  roomNumber String?
+  role       Role       @default(MEMBER)
+  status     UserStatus @default(ACTIVE)
+  societyId  String?
+  society    Society?   @relation(fields: [societyId], references: [id])
+  books      Book[]     @relation("OwnerHistory")
+  requests   ExchangeRequest[] @relation("Requester")
+  createdAt  DateTime   @default(now())
+}
+
+enum Condition {
+  NEW
+  GOOD
+  OLD
+}
+
+enum BookStatus {
+  AVAILABLE
+  LENT
+  NOT_AVAILABLE
+}
+
+model Book {
+  id          String   @id @default(uuid())
+  title       String
+  author      String
+  category    String
+  condition   Condition
+  imageUrl    String?
+  status      BookStatus @default(AVAILABLE)
+  ownerId     String
+  owner       User     @relation("OwnerHistory", fields: [ownerId], references: [id])
+  societyId   String
+  society     Society  @relation(fields: [societyId], references: [id])
+  requests    ExchangeRequest[]
+  createdAt   DateTime @default(now())
+}
+
+enum RequestStatus {
+  REQUESTED
+  APPROVED
+  REJECTED
+  PICKED
+  RETURNED
+}
+
+model ExchangeRequest {
+  id          String   @id @default(uuid())
+  bookId      String
+  book        Book     @relation(fields: [bookId], references: [id])
+  requesterId String
+  requester   User     @relation("Requester", fields: [requesterId], references: [id])
+  status      RequestStatus @default(REQUESTED)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
