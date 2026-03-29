@@ -121,8 +121,8 @@ npm run seed:admin
 
 Default seeded admin:
 
-- Phone: `9999999999`
-- Password: `Admin@123`
+- Phone: ``
+- Password: ``
 
 ### 4. Start backend
 
