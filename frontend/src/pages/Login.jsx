@@ -2,7 +2,18 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/useAuth';
 
-const API_BASE = import.meta.env.PROD ? '/.netlify/functions/api/api' : '/api';
+const API_BASE = '/api';
+
+function formBody(values) {
+    return new URLSearchParams(
+        Object.entries(values).reduce((acc, [key, value]) => {
+            if (value !== undefined && value !== null) {
+                acc[key] = value;
+            }
+            return acc;
+        }, {})
+    );
+}
 
 export default function Login() {
     const [phone, setPhone] = useState('');
@@ -21,9 +32,9 @@ export default function Login() {
         try {
             const res = await fetch(`${API_BASE}/auth/login`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 credentials: 'include',
-                body: JSON.stringify({ phone, password })
+                body: formBody({ phone, password })
             });
             const data = await res.json();
             if (!res.ok) throw new Error(data.error);
@@ -41,8 +52,8 @@ export default function Login() {
         try {
             const res = await fetch(`${API_BASE}/auth/check-user`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ phone })
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: formBody({ phone })
             });
             const data = await res.json();
             if (!res.ok) throw new Error(data.error);
@@ -55,8 +66,8 @@ export default function Login() {
             } else {
                 const otpRes = await fetch(`${API_BASE}/auth/request-otp`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ phone, name: data.name || name })
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: formBody({ phone, name: data.name || name })
                 });
                 const otpData = await otpRes.json();
                 if (!otpRes.ok) throw new Error(otpData.error);
@@ -79,9 +90,9 @@ export default function Login() {
         try {
             const res = await fetch(`${API_BASE}/auth/verify-otp`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 credentials: 'include',
-                body: JSON.stringify({ phone, otp, name, password })
+                body: formBody({ phone, otp, name, password })
             });
             const data = await res.json();
             if (!res.ok) throw new Error(data.details || data.error || 'Verification failed');
