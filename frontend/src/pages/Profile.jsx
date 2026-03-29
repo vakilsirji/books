@@ -74,8 +74,13 @@ export default function Profile() {
                 <h3>Help</h3>
                 <div className="card" style={{ marginTop: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                     <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
-                        Need help with login, society joining, or book requests? Contact support on WhatsApp.
+                        Need help with BookCircle? You can contact support on WhatsApp for quick assistance.
                     </p>
+                    <div style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', lineHeight: 1.6 }}>
+                        <p><strong>Support can help with:</strong> login issues, joining a society, account approval, adding books, and book request problems.</p>
+                        <p><strong>Support number:</strong> {supportNumber}</p>
+                        <p><strong>Tip:</strong> when messaging support, share your phone number and a short description of the problem.</p>
+                    </div>
                     <a
                         href={supportLink}
                         target="_blank"
