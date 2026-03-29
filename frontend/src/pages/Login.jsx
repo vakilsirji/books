@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/useAuth';
 
+const API_BASE = import.meta.env.PROD ? '/.netlify/functions/api' : '/api';
+
 export default function Login() {
     const [phone, setPhone] = useState('');
     const [name, setName] = useState('');
@@ -14,47 +16,10 @@ export default function Login() {
     const { login } = useAuth();
     const navigate = useNavigate();
 
-    const handleCheckUser = async (e) => {
-        e.preventDefault();
-        if (!phone) return setError('Phone is required');
-        try {
-            const res = await fetch('/api/auth/check-user', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ phone })
-            });
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.error);
-
-            setUserStatus(data);
-            if (data.name) setName(data.name);
-
-            if (data.exists && data.hasPassword) {
-                // Known user with password -> Just ask for password
-                setStep(2);
-            } else {
-                // New user or legacy user -> Need OTP to set password
-                const otpRes = await fetch('/api/auth/request-otp', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ phone, name: data.name || name })
-                });
-                const otpData = await otpRes.json();
-                if (!otpRes.ok) throw new Error(otpData.error);
-
-                setOtp(otpData.mockOtp); // Auto-fill for MVP
-                setStep(2);
-            }
-            error && setError('');
-        } catch (err) {
-            setError(err.message);
-        }
-    };
-
     const handlePasswordLogin = async (e) => {
         e.preventDefault();
         try {
-            const res = await fetch('/api/auth/login', {
+            const res = await fetch(`${API_BASE}/auth/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
@@ -70,6 +35,41 @@ export default function Login() {
         }
     };
 
+    const handleCheckUser = async (e) => {
+        e.preventDefault();
+        if (!phone) return setError('Phone is required');
+        try {
+            const res = await fetch(`${API_BASE}/auth/check-user`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ phone })
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error);
+
+            setUserStatus(data);
+            if (data.name) setName(data.name);
+
+            if (data.exists && data.hasPassword) {
+                setStep(2);
+            } else {
+                const otpRes = await fetch(`${API_BASE}/auth/request-otp`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phone, name: data.name || name })
+                });
+                const otpData = await otpRes.json();
+                if (!otpRes.ok) throw new Error(otpData.error);
+
+                setOtp(otpData.mockOtp);
+                setStep(2);
+            }
+            error && setError('');
+        } catch (err) {
+            setError(err.message);
+        }
+    };
+
     const handleVerifyOtpFlow = async (e) => {
         e.preventDefault();
         if (!userStatus.exists || !userStatus.hasPassword) {
@@ -77,7 +77,7 @@ export default function Login() {
             if (!password) return setError('Password is required');
         }
         try {
-            const res = await fetch('/api/auth/verify-otp', {
+            const res = await fetch(`${API_BASE}/auth/verify-otp`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
