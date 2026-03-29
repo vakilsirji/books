@@ -14,9 +14,18 @@ const societySelect = {
     subscriptionEndsAt: true
 };
 
+function getPhoneFromBody(body = {}) {
+    const candidate = body.phone ?? body.phoneNumber ?? body.mobile ?? '';
+    return String(candidate).trim();
+}
+
 // Check if user exists and has a password
 router.post('/check-user', async (req, res) => {
-    const { phone } = req.body;
+    const phone = getPhoneFromBody(req.body);
+    if (!phone) {
+        return res.status(400).json({ error: 'Phone is required' });
+    }
+
     try {
         const user = await prisma.user.findUnique({
             where: { phone },
@@ -44,7 +53,12 @@ router.post('/check-user', async (req, res) => {
 
 // Login with Password
 router.post('/login', async (req, res) => {
-    const { phone, password } = req.body;
+    const phone = getPhoneFromBody(req.body);
+    const { password } = req.body;
+    if (!phone) {
+        return res.status(400).json({ error: 'Phone is required' });
+    }
+
     try {
         const user = await prisma.user.findUnique({
             where: { phone },
@@ -76,7 +90,8 @@ router.post('/login', async (req, res) => {
 
 // Request OTP (Mock)
 router.post('/request-otp', async (req, res) => {
-    const { phone, name } = req.body;
+    const phone = getPhoneFromBody(req.body);
+    const { name } = req.body;
     if (!phone) return res.status(400).json({ error: 'Phone is required' });
 
     try {
@@ -98,7 +113,11 @@ router.post('/request-otp', async (req, res) => {
 
 // Verify OTP & Complete Signup/Update
 router.post('/verify-otp', async (req, res) => {
-    const { phone, otp, name, password } = req.body;
+    const phone = getPhoneFromBody(req.body);
+    const { otp, name, password } = req.body;
+    if (!phone) {
+        return res.status(400).json({ error: 'Phone is required' });
+    }
 
     // Hardcoded MVP check
     if (otp !== '123456') {
