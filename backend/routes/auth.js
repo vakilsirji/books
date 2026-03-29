@@ -41,6 +41,21 @@ function getPhoneFromRequest(req) {
     return getPhoneFromBody(query);
 }
 
+function getPasswordFromRequest(req) {
+    const body = getRequestBody(req);
+    const fromBody = body.password;
+    if (fromBody) {
+        return String(fromBody);
+    }
+
+    const query = req.query || req.netlifyEvent?.queryStringParameters || {};
+    if (query.password) {
+        return String(query.password);
+    }
+
+    return '';
+}
+
 function getRequestBody(req) {
     if (
         req.body &&
@@ -106,7 +121,7 @@ router.post('/check-user', async (req, res) => {
 router.post('/login', async (req, res) => {
     const body = getRequestBody(req);
     const phone = getPhoneFromRequest(req);
-    const { password } = body;
+    const password = getPasswordFromRequest(req);
     if (!phone) {
         return res.status(400).json({ error: 'Phone is required' });
     }
