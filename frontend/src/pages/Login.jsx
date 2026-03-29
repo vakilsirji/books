@@ -27,6 +27,19 @@ export default function Login() {
     const { login } = useAuth();
     const navigate = useNavigate();
 
+    const getPostLoginPath = (userData) => {
+        if (userData.role === 'ADMIN' || userData.role === 'SOCIETY_ADMIN') {
+            return '/admin';
+        }
+        if (!userData.societyId) {
+            return '/society';
+        }
+        if (userData.status === 'PENDING') {
+            return '/pending';
+        }
+        return '/';
+    };
+
     const handlePasswordLogin = async (e) => {
         e.preventDefault();
         try {
@@ -40,7 +53,7 @@ export default function Login() {
             if (!res.ok) throw new Error(data.error);
 
             login(data.user, data.token);
-            navigate(data.user.role === 'ADMIN' ? '/admin' : (data.user.societyId ? '/' : '/society'));
+            navigate(getPostLoginPath(data.user));
         } catch (err) {
             setError(err.message);
         }
@@ -98,7 +111,7 @@ export default function Login() {
             if (!res.ok) throw new Error(data.details || data.error || 'Verification failed');
 
             login(data.user, data.token);
-            navigate(data.user.role === 'ADMIN' ? '/admin' : (data.user.societyId ? '/' : '/society'));
+            navigate(getPostLoginPath(data.user));
         } catch (err) {
             setError(err.message);
         }
