@@ -19,6 +19,17 @@ function getPhoneFromBody(body = {}) {
     return String(candidate).trim();
 }
 
+function parseFormEncoded(value) {
+    const params = new URLSearchParams(value);
+    const result = {};
+
+    for (const [key, formValue] of params.entries()) {
+        result[key] = formValue;
+    }
+
+    return result;
+}
+
 function getPhoneFromRequest(req) {
     const body = getRequestBody(req);
     const fromBody = getPhoneFromBody(body);
@@ -39,7 +50,7 @@ function getRequestBody(req) {
         try {
             return JSON.parse(req.body);
         } catch (_error) {
-            return {};
+            return parseFormEncoded(req.body);
         }
     }
 
@@ -47,7 +58,7 @@ function getRequestBody(req) {
         try {
             return JSON.parse(req.rawBody);
         } catch (_error) {
-            return {};
+            return parseFormEncoded(req.rawBody);
         }
     }
 
