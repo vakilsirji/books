@@ -3,6 +3,7 @@ import { AuthProvider } from './context/AuthContext';
 import { useAuth } from './context/useAuth';
 
 import Login from './pages/Login';
+import LandingPage from './pages/LandingPage';
 import SelectSociety from './pages/SelectSociety';
 import Dashboard from './pages/Dashboard';
 import AddBook from './pages/AddBook';
@@ -37,7 +38,7 @@ const ProtectedRoute = ({ children }) => {
 
 const HomeRoute = () => {
   const { user } = useAuth();
-  if (!user) return <Navigate to="/login" replace />;
+  if (!user) return <Navigate to="/" replace />;
   if (user.role === 'ADMIN') return <Navigate to="/admin" replace />;
   return <ProtectedRoute><Dashboard /></ProtectedRoute>;
 };
@@ -80,11 +81,12 @@ function App() {
         <Router>
           <PWAInstallPrompt />
           <Routes>
+            <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<Login />} />
             <Route path="/society" element={<SocietyRoute><SelectSociety /></SocietyRoute>} />
             <Route path="/pending" element={<PendingApproval />} />
 
-            <Route path="/" element={<HomeRoute />} />
+            <Route path="/home" element={<HomeRoute />} />
             <Route path="/add" element={<MemberRoute><AddBook /></MemberRoute>} />
             <Route path="/requests" element={<MemberRoute><Requests /></MemberRoute>} />
             <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />

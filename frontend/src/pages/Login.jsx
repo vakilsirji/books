@@ -38,7 +38,7 @@ export default function Login() {
         if (userData.status === 'PENDING') {
             return '/pending';
         }
-        return '/';
+        return '/home';
     };
 
     useEffect(() => {
