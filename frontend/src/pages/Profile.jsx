@@ -1,8 +1,10 @@
 import { useAuth } from '../context/useAuth';
-import { User, MapPin, Phone, LogOut } from 'lucide-react';
+import { User, MapPin, Phone, LogOut, MessageCircle } from 'lucide-react';
 
 export default function Profile() {
     const { user, logout } = useAuth();
+    const supportNumber = '8369977362';
+    const supportLink = `https://wa.me/91${supportNumber}?text=${encodeURIComponent('Hi, I need help with BookCircle.')}`;
 
     const handleLogout = async () => {
         if (confirm('Are you sure you want to logout?')) {
@@ -66,6 +68,30 @@ export default function Profile() {
                     <LogOut size={18} />
                     Logout
                 </button>
+            </div>
+
+            <div style={{ marginTop: '2rem' }}>
+                <h3>Help</h3>
+                <div className="card" style={{ marginTop: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
+                        Need help with login, society joining, or book requests? Contact support on WhatsApp.
+                    </p>
+                    <a
+                        href={supportLink}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="btn btn-primary"
+                        style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '0.5rem'
+                        }}
+                    >
+                        <MessageCircle size={18} />
+                        WhatsApp Support
+                    </a>
+                </div>
             </div>
 
             <div style={{ marginTop: '2rem' }}>
