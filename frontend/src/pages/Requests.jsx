@@ -7,6 +7,15 @@ export default function Requests() {
     const [tab, setTab] = useState('incoming');
     const { token } = useAuth();
 
+    const formBody = (values) => new URLSearchParams(
+        Object.entries(values).reduce((acc, [key, value]) => {
+            if (value !== undefined && value !== null && value !== '') {
+                acc[key] = value;
+            }
+            return acc;
+        }, {})
+    ).toString();
+
     const fetchRequests = useCallback(async () => {
         try {
             const headers = {};
@@ -32,14 +41,14 @@ export default function Requests() {
 
     const updateStatus = async (id, status) => {
         try {
-            const res = await fetch(`/api/requests/${id}`, {
+            const res = await fetch(`/api/requests/${id}?status=${encodeURIComponent(status)}`, {
                 method: 'PATCH',
                 headers: {
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'application/x-www-form-urlencoded',
                     'Authorization': `Bearer ${token}`
                 },
                 credentials: 'include',
-                body: JSON.stringify({ status })
+                body: formBody({ status })
             });
             if (res.ok) {
                 fetchRequests();

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/useAuth';
 import { ArrowRight, BookOpen, MessageCircle, PhoneCall, Search, Sparkles, Users } from 'lucide-react';
 
@@ -6,7 +7,9 @@ export default function Dashboard() {
     const [books, setBooks] = useState([]);
     const [search, setSearch] = useState('');
     const [loadingMsg, setLoadingMsg] = useState('');
+    const [requestedBookIds, setRequestedBookIds] = useState([]);
     const { user, token } = useAuth();
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchBooks = async () => {
@@ -45,7 +48,11 @@ export default function Dashboard() {
 
             const data = await res.json();
             if (res.ok) {
+                setRequestedBookIds((current) => (
+                    current.includes(bookId) ? current : [...current, bookId]
+                ));
                 alert('Request sent to owner!');
+                navigate('/requests');
             } else {
                 alert(`Error: ${data.error}`);
             }
@@ -182,8 +189,9 @@ export default function Dashboard() {
                                     <button
                                         className="btn btn-primary"
                                         onClick={() => handleRequest(book.id)}
+                                        disabled={requestedBookIds.includes(book.id)}
                                     >
-                                        Request Book
+                                        {requestedBookIds.includes(book.id) ? 'Request Sent' : 'Request Book'}
                                     </button>
                                     <div className="book-dashboard-contact-row">
                                         {getWhatsAppLink(book) && (
