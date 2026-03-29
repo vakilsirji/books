@@ -37,18 +37,31 @@ export const AuthProvider = ({ children }) => {
 
     useEffect(() => {
         if (token) {
+            const controller = new AbortController();
+            let active = true;
+
             fetch('/api/auth/me', {
                 headers: { 'Authorization': `Bearer ${token}` },
-                credentials: 'include'
+                credentials: 'include',
+                signal: controller.signal
             })
                 .then(res => res.json())
                 .then(data => {
-                    if (data.id) {
+                    if (active && data.id) {
                         setUser(data);
                         localStorage.setItem('user', JSON.stringify(data));
                     }
                 })
-                .catch(console.error);
+                .catch((error) => {
+                    if (error.name !== 'AbortError') {
+                        console.error(error);
+                    }
+                });
+
+            return () => {
+                active = false;
+                controller.abort();
+            };
         }
     }, [token]);
 
