@@ -2,6 +2,17 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/useAuth';
 
+function formBody(values) {
+    return new URLSearchParams(
+        Object.entries(values).reduce((acc, [key, value]) => {
+            if (value !== undefined && value !== null) {
+                acc[key] = value;
+            }
+            return acc;
+        }, {})
+    );
+}
+
 export default function AddBook() {
     const [formData, setFormData] = useState({
         title: '', author: '', category: 'Fiction', condition: 'GOOD', imageUrl: ''
@@ -14,14 +25,16 @@ export default function AddBook() {
         e.preventDefault();
         setLoading(true);
         try {
-            const res = await fetch('/api/books', {
+            const res = await fetch(
+                `/api/books?title=${encodeURIComponent(formData.title)}&author=${encodeURIComponent(formData.author)}&category=${encodeURIComponent(formData.category)}&condition=${encodeURIComponent(formData.condition)}&imageUrl=${encodeURIComponent(formData.imageUrl)}`,
+                {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'application/x-www-form-urlencoded',
                     'Authorization': `Bearer ${token}`
                 },
                 credentials: 'include',
-                body: JSON.stringify(formData)
+                body: formBody(formData)
             });
             if (!res.ok) throw new Error((await res.json()).error);
 

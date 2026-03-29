@@ -36,11 +36,11 @@ export default function Dashboard() {
             const res = await fetch('/api/requests', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'application/x-www-form-urlencoded',
                     Authorization: `Bearer ${token}`,
                 },
                 credentials: 'include',
-                body: JSON.stringify({ bookId }),
+                body: new URLSearchParams({ bookId }),
             });
 
             const data = await res.json();

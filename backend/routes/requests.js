@@ -5,9 +5,67 @@ const authMiddleware = require('../middleware/authMiddleware');
 
 router.use(authMiddleware);
 
+function parseFormEncoded(value) {
+    const params = new URLSearchParams(value);
+    const result = {};
+
+    for (const [key, formValue] of params.entries()) {
+        result[key] = formValue;
+    }
+
+    return result;
+}
+
+function getRequestBody(req) {
+    if (
+        req.body &&
+        typeof req.body === 'object' &&
+        !Array.isArray(req.body) &&
+        Object.keys(req.body).length > 0
+    ) {
+        return req.body;
+    }
+
+    if (typeof req.body === 'string' && req.body.trim()) {
+        try {
+            return JSON.parse(req.body);
+        } catch (_error) {
+            return parseFormEncoded(req.body);
+        }
+    }
+
+    if (typeof req.rawBody === 'string' && req.rawBody.trim()) {
+        try {
+            return JSON.parse(req.rawBody);
+        } catch (_error) {
+            return parseFormEncoded(req.rawBody);
+        }
+    }
+
+    return {};
+}
+
+function getFieldFromRequest(req, fieldName) {
+    const body = getRequestBody(req);
+    const fromBody = body[fieldName];
+    if (fromBody !== undefined && fromBody !== null && fromBody !== '') {
+        return String(fromBody);
+    }
+
+    const query = req.query || req.netlifyEvent?.queryStringParameters || {};
+    if (query[fieldName] !== undefined && query[fieldName] !== null && query[fieldName] !== '') {
+        return String(query[fieldName]);
+    }
+
+    return '';
+}
+
 // Request a book
 router.post('/', async (req, res) => {
-    const { bookId } = req.body;
+    const bookId = getFieldFromRequest(req, 'bookId');
+    if (!bookId) {
+        return res.status(400).json({ error: 'Book ID is required' });
+    }
     try {
         const book = await prisma.book.findUnique({ where: { id: bookId } });
         if (!book || book.status !== 'AVAILABLE') {
