@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/useAuth';
 
@@ -24,8 +24,9 @@ export default function Login() {
     const [step, setStep] = useState(1); // 1: Phone, 2: Auth (Password or OTP)
     const [error, setError] = useState('');
 
-    const { login } = useAuth();
+    const { login, logout } = useAuth();
     const navigate = useNavigate();
+    const resetOnceRef = useRef(false);
 
     const getPostLoginPath = (userData) => {
         if (userData.role === 'ADMIN' || userData.role === 'SOCIETY_ADMIN') {
@@ -39,6 +40,12 @@ export default function Login() {
         }
         return '/';
     };
+
+    useEffect(() => {
+        if (resetOnceRef.current) return;
+        resetOnceRef.current = true;
+        logout().catch(() => {});
+    }, [logout]);
 
     const handlePasswordLogin = async (e) => {
         e.preventDefault();
