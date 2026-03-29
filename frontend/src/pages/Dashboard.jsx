@@ -33,7 +33,7 @@ export default function Dashboard() {
     const handleRequest = async (bookId) => {
         setLoadingMsg('Sending request...');
         try {
-            const res = await fetch('/api/requests', {
+            const res = await fetch(`/api/requests?bookId=${encodeURIComponent(bookId)}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
