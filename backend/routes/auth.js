@@ -19,9 +19,34 @@ function getPhoneFromBody(body = {}) {
     return String(candidate).trim();
 }
 
+function getRequestBody(req) {
+    if (req.body && typeof req.body === 'object' && !Array.isArray(req.body)) {
+        return req.body;
+    }
+
+    if (typeof req.body === 'string' && req.body.trim()) {
+        try {
+            return JSON.parse(req.body);
+        } catch (_error) {
+            return {};
+        }
+    }
+
+    if (typeof req.rawBody === 'string' && req.rawBody.trim()) {
+        try {
+            return JSON.parse(req.rawBody);
+        } catch (_error) {
+            return {};
+        }
+    }
+
+    return {};
+}
+
 // Check if user exists and has a password
 router.post('/check-user', async (req, res) => {
-    const phone = getPhoneFromBody(req.body);
+    const body = getRequestBody(req);
+    const phone = getPhoneFromBody(body);
     if (!phone) {
         return res.status(400).json({ error: 'Phone is required' });
     }
@@ -53,8 +78,9 @@ router.post('/check-user', async (req, res) => {
 
 // Login with Password
 router.post('/login', async (req, res) => {
-    const phone = getPhoneFromBody(req.body);
-    const { password } = req.body;
+    const body = getRequestBody(req);
+    const phone = getPhoneFromBody(body);
+    const { password } = body;
     if (!phone) {
         return res.status(400).json({ error: 'Phone is required' });
     }
@@ -90,8 +116,9 @@ router.post('/login', async (req, res) => {
 
 // Request OTP (Mock)
 router.post('/request-otp', async (req, res) => {
-    const phone = getPhoneFromBody(req.body);
-    const { name } = req.body;
+    const body = getRequestBody(req);
+    const phone = getPhoneFromBody(body);
+    const { name } = body;
     if (!phone) return res.status(400).json({ error: 'Phone is required' });
 
     try {
@@ -113,8 +140,9 @@ router.post('/request-otp', async (req, res) => {
 
 // Verify OTP & Complete Signup/Update
 router.post('/verify-otp', async (req, res) => {
-    const phone = getPhoneFromBody(req.body);
-    const { otp, name, password } = req.body;
+    const body = getRequestBody(req);
+    const phone = getPhoneFromBody(body);
+    const { otp, name, password } = body;
     if (!phone) {
         return res.status(400).json({ error: 'Phone is required' });
     }
