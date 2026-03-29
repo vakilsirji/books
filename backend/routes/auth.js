@@ -42,7 +42,12 @@ function getPhoneFromRequest(req) {
 }
 
 function getRequestBody(req) {
-    if (req.body && typeof req.body === 'object' && !Array.isArray(req.body)) {
+    if (
+        req.body &&
+        typeof req.body === 'object' &&
+        !Array.isArray(req.body) &&
+        Object.keys(req.body).length > 0
+    ) {
         return req.body;
     }
 
