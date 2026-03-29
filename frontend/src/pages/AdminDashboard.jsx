@@ -159,7 +159,8 @@ function PlatformAdminView({ token }) {
 
     const createSociety = async (e) => {
         e.preventDefault();
-        const res = await fetch('/api/societies/admin/platform/societies', {
+        const query = new URLSearchParams(createForm).toString();
+        const res = await fetch(`/api/societies/admin/platform/societies?${query}`, {
             method: 'POST',
             headers: { ...headers, 'Content-Type': 'application/x-www-form-urlencoded' },
             credentials: 'include',
