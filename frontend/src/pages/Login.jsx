@@ -30,7 +30,7 @@ export default function Login() {
     const handlePasswordLogin = async (e) => {
         e.preventDefault();
         try {
-            const res = await fetch(`${API_BASE}/auth/login`, {
+            const res = await fetch(`${API_BASE}/auth/login?phone=${encodeURIComponent(phone)}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 credentials: 'include',
