@@ -45,7 +45,8 @@ function SocietyAdminView({ token, user }) {
     const active = members.filter((m) => m.status === 'ACTIVE');
 
     const act = async (url, body) => {
-        const res = await fetch(url, {
+        const query = new URLSearchParams(body).toString();
+        const res = await fetch(`${url}?${query}`, {
             method: 'PATCH',
             headers: { ...headers, 'Content-Type': 'application/x-www-form-urlencoded' },
             credentials: 'include',
@@ -137,7 +138,8 @@ function PlatformAdminView({ token }) {
         setSavingId(societyId);
         setActionError('');
         try {
-            const res = await fetch(url, {
+            const query = new URLSearchParams(body).toString();
+            const res = await fetch(`${url}?${query}`, {
                 method: 'PATCH',
                 headers: { ...headers, 'Content-Type': 'application/x-www-form-urlencoded' },
                 credentials: 'include',
