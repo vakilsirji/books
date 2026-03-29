@@ -74,12 +74,14 @@ export default function Profile() {
                 <h3>Help</h3>
                 <div className="card" style={{ marginTop: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                     <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
-                        Need help with BookCircle? You can contact support on WhatsApp for quick assistance.
+                        How to use BookCircle in a few simple steps.
                     </p>
                     <div style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', lineHeight: 1.6 }}>
-                        <p><strong>Support can help with:</strong> login issues, joining a society, account approval, adding books, and book request problems.</p>
-                        <p><strong>Support number:</strong> {supportNumber}</p>
-                        <p><strong>Tip:</strong> when messaging support, share your phone number and a short description of the problem.</p>
+                        <p><strong>1.</strong> Join your society or create one if you are the first user.</p>
+                        <p><strong>2.</strong> Add your books so other members can see them.</p>
+                        <p><strong>3.</strong> Request available books from other users.</p>
+                        <p><strong>4.</strong> Check the Requests tab to track approval, pickup, and return updates.</p>
+                        <p><strong>Need help?</strong> Use WhatsApp support if you face any issue while using the app.</p>
                     </div>
                     <a
                         href={supportLink}
