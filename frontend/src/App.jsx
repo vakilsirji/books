@@ -38,7 +38,7 @@ const ProtectedRoute = ({ children }) => {
 
 const HomeRoute = () => {
   const { user } = useAuth();
-  if (!user) return <Navigate to="/" replace />;
+  if (!user) return <Navigate to="/login" replace />;  // ✅ fixed: was "/" (LandingPage), now goes to login
   if (user.role === 'ADMIN') return <Navigate to="/admin" replace />;
   return <ProtectedRoute><Dashboard /></ProtectedRoute>;
 };
