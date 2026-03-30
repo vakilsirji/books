@@ -9,7 +9,7 @@ export default function Navigation() {
 
     return (
         <nav className="bottom-nav">
-            <NavLink to={isPlatformAdmin ? "/admin" : "/"} className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
+            <NavLink to={isPlatformAdmin ? "/admin" : "/home"} className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
                 {isPlatformAdmin ? <Shield size={24} /> : <BookOpen size={24} />}
                 <span>{isPlatformAdmin ? 'Platform' : 'Books'}</span>
             </NavLink>
